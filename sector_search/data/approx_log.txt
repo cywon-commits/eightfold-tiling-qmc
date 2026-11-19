@@ -1,0 +1,1 @@
+sectors_S12R17.json sectors 55 exhausted 40 states 71824 4740s
