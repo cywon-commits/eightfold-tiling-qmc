@@ -2,7 +2,7 @@ import numpy as np, json
 from style import *
 from matplotlib.patches import Polygon
 from matplotlib.colors import TwoSlopeNorm
-from phases import graph, EV
+from phases import graph, ev
 from lswt_local import local
 show=[('hub',8,'(a)','$z=6$ hubs\n$m=1/27$'),('B15',6,'(b)','3/5 pairs\n$m=1/15$'),
       ('E10',12,'(c)','hub-free crystal\n$m=1/5$'),('dice',4,'(d)','dice\n$m=1/3$')]
@@ -14,7 +14,7 @@ NA=Normalize(0.29,0.44); NB=Normalize(0.29,0.37); CA=plt.cm.Reds; CB=plt.cm.Blue
 rng=[]
 for k,(key,L,lab,title) in enumerate(show):
     ax=fig.add_subplot(gs[k//2,k%2]); g=graph(key,L); r=local(g['N'],g['B'])
-    cen=np.array([(R@EV).mean(0) for R in g['tiles']]); c0=np.median(cen,0)
+    EV=ev(key); cen=np.array([(R@EV).mean(0) for R in g["tiles"]]); c0=np.median(cen,0)
     W=4.6; sel=[t for t in range(len(cen)) if abs(cen[t,0]-c0[0])<W and abs(cen[t,1]-c0[1])<W]
     for t in sel:
         R=g['tiles'][t]; a_,b_=g['kinds'][t]

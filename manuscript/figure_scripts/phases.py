@@ -19,8 +19,13 @@ PHASES={  # key: (loader, label, tau)
  'dice':     (lambda: small('(2, 0, 2, 2)',1.0), 'dice', 1.0),
 }
 _NP=json.load(open(D+'fieldfig/newphases.json'))
+EV8=np.array([[np.cos(j*np.pi/4),np.sin(j*np.pi/4)] for j in range(4)])   # star used by the sector search
+_EVK={}
 for _k,_v in _NP.items():
-    PHASES[_k]=((lambda v=_v:(v['tiles'],v['T'],v['sigma'])),_k,_v['tau'])
+    PHASES[_k]=((lambda v=_v:(v['tiles'],v['T'],v['sigma'])),_k,_v['tau']); _EVK[_k]=EV8
+def ev(key):
+    """projection star for drawing: sector-search phases use e_j=(cos j pi/4, sin j pi/4); earlier phases use EV"""
+    return _EVK.get(key,EV)
 def graph(key,L):
     tiles,T,sig=PHASES[key][0](); T1,T2=[np.array(t) for t in T]; tl=[(np.array(R),a,b) for R,a,b in tiles]
     A=np.stack([L*T1,L*T2],1).astype(float); pinv=np.linalg.pinv(A)
