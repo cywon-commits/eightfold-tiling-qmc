@@ -21,6 +21,7 @@ Code and data for *Quantum selection of eightfold rhombus tilings: faceting at z
 - `analyze_enum.py N` screens the tilings and writes `data/screen_N*.json`: LSWT at about 600 and 1500 sites, plus the Hartree ratio. `compare.py N` merges these with the earlier phase set (`data/compare_N*.json`).
 - `resample.py 4000 compare_N*.json out.json` gives the QMC-anchored staircase and the presence probability of each plateau over 4000 redraws. Phase energies use the same-cell QMC/LSWT ratio times the converged LSWT cost, and the finite-size change between the two largest cells is added to the error. Outputs are in `data/resample_*.json`.
 - `newpath.py` writes the central ground-state paths (`data/path_N*.json`). `window.py` lists the phases on the paths and the energy gain per search depth.
+- `data/window_crystals_W1-W31.json` lists the window crystals of Appendix E (Fig. 10, Table II) under their labels W1–W31. For each crystal it gives the lifted periods, the tiles (corner lifts and families), the projection used for drawing, and the numbers shown in Table II. `internal_name` is the working label used in the run files.
 - `approx_sectors.py S R` and `run_approx.py` cover the targeted check of the σ = 12/17 sectors (N = 29). All 7×10⁴ tilings have M = 0, as required by the parity argument in the paper.
 
 ## Seeded QMC (`qmc_stage4_seeds/`)
