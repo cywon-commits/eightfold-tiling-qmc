@@ -1,92 +1,74 @@
+"""Energy balance along the ground-state path (N<=24) with its uncertainty: median and 16-84% band over 500 redraws
+of the phase energies (same error model as Fig. 7). Central path (no redraw) dashed in (b),(c)."""
 import numpy as np, json, glob
 from style import *
-RUN='/mnt/user-data/outputs/fieldfig/runs/'
-SEED='/mnt/user-data/outputs/fieldfig/runs_seeds/'
-ESQ=-0.669437; s0=1/np.sqrt(2)
-import sys; sys.path.insert(0,'/mnt/user-data/outputs/sectors')
-PATH=json.load(open('/mnt/user-data/outputs/sectors/path_N24.json'))
-Q={}
-byk={}
+ESQ=-0.669437; s0=1/np.sqrt(2); chi=0.065
+D=np.load('/mnt/user-data/outputs/sectors/path_redraws_N24.npz',allow_pickle=True)
+W=D['W']; hs=D['hs']; S=D['sigma']; T=D['tau']; EPS=D['eps']; qk=D['qkey']; NS,H,n=W.shape
+# QMC split of exchange energy into zz and xy parts (seeded runs, largest cell)
+SEED='/mnt/user-data/outputs/fieldfig/runs_seeds/'; byk={}
 for f in glob.glob(SEED+'*_s*.json'):
     r=json.load(open(f)); byk.setdefault(r['key'],{}).setdefault(r['L'],[]).append(r)
-for k,d in byk.items():
-    rs=d[max(d)]; N=rs[0]['N']
-    Q[k]=dict(ezz=np.mean([r['E_zz'] for r in rs])/N,exy=np.mean([r['E_xy'] for r in rs])/N,e=np.mean([r['E_J'] for r in rs])/N,sz=rs[0]['fixM']/N,sigma=rs[0]['sigma'])
-# canted square facets from fixed-M runs on L=16
-sq=sorted([json.load(open(f)) for f in glob.glob(RUN+'sq16_*.json')],key=lambda r:r['fixM'])
-N16=256; M=np.array([r['fixM'] for r in sq]); x=M*(M+1)/N16**2
-ezz=np.array([r['E_zz']/N16 for r in sq]); exy=np.array([r['E_xy']/N16 for r in sq]); etot=ezz+exy
-bz=np.polyfit(x,ezz,1)[0]; bx=np.polyfit(x,exy,1)[0]; chi_fit=1/(2*(bz+bx)); chi=0.065
-fz=bz/(bz+bx); fx=bx/(bz+bx)            # how the canting cost m^2/(2chi) splits between zz and xy (L=16 sectors)
-print('square: chi(L=16 tower)=%.4f, used chi=%.3f, split zz:xy = %.2f:%.2f'%(chi_fit,chi,fz,fx))
-def sq_h(h): ms=chi*h; c=ms**2/(2*chi); return ESQ/3+fz*c, 2*ESQ/3+fx*c, ms
-info=PATH['info']
-for k,q in Q.items():
-    if k not in info: continue
-    et=ESQ+info[k]['eps']/(1+q['sigma']); q['ezz'],q['exy']=et*q['ezz']/q['e'],et*q['exy']/q['e']; q['e']=et
-rows=PATH['rows']; hs=np.array([h for h,w in rows])
-keys=[]
-for h,w in rows:
-    for k in w:
-        if k not in keys: keys.append(k)
-missing=[k for k in keys if k not in Q]; print('phases on path:',keys,'without QMC split:',missing)
-lab={'hub':'$z=6$ hubs','runs3':'ribbons','z5crystal':'$z=5$ crystal','dice':'dice'}
-for k in keys:
-    if k not in lab: lab[k]=r'%s ($\sigma=%.2f$)'%(k,info[k]['sigma'])
-pal=['#4c72b0','#8da0cb','#a6d854','#66c2a5','#ffd92f','#e5c494','#fc8d62','#e78ac3','#b3002d','#8c564b','#17becf','#bcbd22','#7f7f7f','#9467bd','#2ca02c']
-colors=dict(zip(keys,pal))
-F={k:np.zeros(len(hs)) for k in keys}; f0=np.ones(len(hs))
-Ezz=np.zeros(len(hs)); Exy=np.zeros(len(hs)); Sz=np.zeros(len(hs))
-for t,(h,w) in enumerate(rows):
-    tot=0
-    for k,xw in w.items():
-        q=Q[k]; f=xw*(1+q['sigma'])/(1+s0); F[k][t]=f; tot+=f
-        Ezz[t]+=f*q['ezz']; Exy[t]+=f*q['exy']; Sz[t]+=f*q['sz']
-    f0[t]=1-tot; z0,x0,m0=sq_h(h); Ezz[t]+=f0[t]*z0; Exy[t]+=f0[t]*x0; Sz[t]+=f0[t]*m0
-Eex=Ezz+Exy; Ez=-hs*Sz
-steps=[hs[i] for i in range(1,len(hs)) if any(abs(F[k][i]-F[k][i-1])>1e-3 for k in keys)]
-fig,axs=plt.subplots(1,3,figsize=(DCOL,3.05),gridspec_kw=dict(wspace=0.38,bottom=0.32,top=0.93))
-ax=axs[0]; base=np.zeros(len(hs))
-ax.fill_between(hs,0,f0,color='#eeeeee',lw=0,label='canted $z\\equiv4$')
-base=f0.copy()
-def cat(k):
-    if k=='hub': return 'isolated $z=6$ hubs'
-    if k=='runs3': return 'ribbons'
-    if k=='dice': return 'dice'
-    s_,t_=info[k]['sigma'],info[k]['tau']; m_=t_/(2*(1+s_))
-    if abs(m_-0.2)<1e-6: return 'crystals on $m=1/5$'
-    if m_>0.2: return 'crystals with $m>1/5$'
-    return 'window crystals'
+fz={k:np.mean([r['E_zz']/r['E_J'] for r in d[max(d)]]) for k,d in byk.items()}
+mP=T/(2*(1+S))                                     # phase moment m=(N_A-N_B)/N
+mm=np.array([mP[i] for i in range(n) if qk[i] in fz]); ff=np.array([fz[qk[i]] for i in range(n) if qk[i] in fz])
+cf=np.polyfit(mm,ff,1)                             # unmeasured phases: zz share interpolated in m
+FZ=np.array([fz[qk[i]] if qk[i] in fz else np.polyval(cf,mP[i]) for i in range(n)])
+print('zz share vs m fit:',cf,' rms',np.std(ff-np.polyval(cf,mm)))
+ET=ESQ+EPS/(1+S)                                   # exchange energy per site of each phase (central eps)
+# canted square facets (L=16 fixed-M split as before)
+sq=sorted([json.load(open(f)) for f in glob.glob('/mnt/user-data/outputs/fieldfig/runs/sq16_*.json')],key=lambda r:r['fixM'])
+M=np.array([r['fixM'] for r in sq]); x=M*(M+1)/256**2
+bz=np.polyfit(x,[r['E_zz']/256 for r in sq],1)[0]; bx=np.polyfit(x,[r['E_xy']/256 for r in sq],1)[0]; gz=bz/(bz+bx); gx=bx/(bz+bx)
+def sq_h(h): ms=chi*h; c=ms**2/(2*chi); return ESQ/3+gz*c, 2*ESQ/3+gx*c, ms
+SQ=np.array([sq_h(h) for h in hs])
+def cat(i):
+    if qk[i]=='hub': return 0
+    if qk[i]=='runs3': return 1
+    if qk[i]=='dice': return 5
+    if abs(mP[i]-0.2)<1e-6: return 3
+    return 4 if mP[i]>0.2 else 2
 CATS=['isolated $z=6$ hubs','ribbons','window crystals','crystals on $m=1/5$','crystals with $m>1/5$','dice']
-CC=dict(zip(CATS,['#4c72b0','#8da0cb','#66c2a5','#e78ac3','#fc8d62','#b3002d']))
-FC={c:np.zeros(len(hs)) for c in CATS}
-for k in keys: FC[cat(k)]+=F[k]
-for c in CATS:
-    if FC[c].max()<1e-3: continue
-    ax.fill_between(hs,base,base+FC[c],color=CC[c],lw=0,label=c); base+=FC[c]
-print({k:cat(k) for k in keys})
-ax.set_xlim(0,0.3); ax.set_ylim(0,1); ax.set_xlabel(r'$h/J$'); ax.set_ylabel('fraction of sites')
-fig.legend(*ax.get_legend_handles_labels(),frameon=False,fontsize=7.5,loc='lower center',ncol=4,bbox_to_anchor=(0.5,0.0),handlelength=1.0,columnspacing=1.0)
+CC=['#4c72b0','#8da0cb','#1b9e77','#e7298a','#d95f02','#b3002d']; ci=np.array([cat(i) for i in range(n)])
+def decomp(Wt):
+    f=Wt*(1+S[None,:])/(1+s0); f0=1-f.sum(1)
+    Fc=np.stack([f[:,ci==c].sum(1) for c in range(6)],1)
+    ezz=(f*(ET*FZ)[None,:]).sum(1)+f0*SQ[:,0]; exy=(f*(ET*(1-FZ))[None,:]).sum(1)+f0*SQ[:,1]
+    sz=(f*(mP/2)[None,:]).sum(1)+f0*SQ[:,2]
+    return f0,Fc,ezz,exy,sz
+R=[decomp(W[s]) for s in range(NS)]
+F0=np.array([r[0] for r in R]); FC=np.array([r[1] for r in R]); EZ=np.array([r[2] for r in R]); EX=np.array([r[3] for r in R]); SZ=np.array([r[4] for r in R])
+EEX=EZ+EX; EZM=-hs[None,:]*SZ; TOT=EEX+EZM
+q=lambda A:np.percentile(A,[16,50,84],axis=0)
+fig,axs=plt.subplots(1,3,figsize=(DCOL,3.05),gridspec_kw=dict(wspace=0.38,bottom=0.32,top=0.93))
+for a in axs: a.axvspan(0.09,0.18,color='#f2f2f2',zorder=0)
+axs[0].axvspan(0.09,0.18,facecolor='none',edgecolor='0.55',hatch='////',lw=0,zorder=0.5)
+axs[0].text(0.135,0.5,'approximants;\nidentity depends\non $N_{\\max}$',ha='center',va='center',fontsize=6.8,color='0.25',zorder=5,
+            bbox=dict(fc='white',ec='none',alpha=0.8,pad=1.2))
+ax=axs[0]; lo,md,hi=q(F0); ax.fill_between(hs,lo,hi,color='0.6',alpha=0.35,lw=0); ax.plot(hs,md,color='0.45',lw=1.1,label='canted $z\\equiv4$')
+for c in range(6):
+    lo,md,hi=q(FC[:,:,c])
+    if hi.max()<1e-3: continue
+    ax.fill_between(hs,lo,hi,color=CC[c],alpha=0.25,lw=0); ax.plot(hs,md,color=CC[c],lw=1.1,label=CATS[c])
+ax.set_xlim(0,0.3); ax.set_ylim(0,1.02); ax.set_xlabel(r'$h/J$'); ax.set_ylabel('fraction of sites')
+fig.legend(*ax.get_legend_handles_labels(),frameon=False,fontsize=7.5,loc='lower center',ncol=4,bbox_to_anchor=(0.5,0.0),handlelength=1.2,columnspacing=1.0)
 ax=axs[1]
-hh=np.linspace(0,0.3,200); zq=[sq_h(h) for h in hh]
-ax.plot(hh,[z[1] for z in zq],'--',color='#2166ac',lw=0.8); ax.plot(hh,[z[0] for z in zq],'--',color='#b2182b',lw=0.8)
-ax.plot(hs,Exy,'-',color='#2166ac',lw=1.5,label='in-plane ($xx{+}yy$)')
-ax.plot(hs,Ezz,'-',color='#b2182b',lw=1.5,label='normal ($zz$)')
+for A,col,lab in ((EX,'#2166ac','in-plane ($xx{+}yy$)'),(EZ,'#b2182b','normal ($zz$)')):
+    lo,md,hi=q(A); ax.fill_between(hs,lo,hi,color=col,alpha=0.25,lw=0); ax.plot(hs,md,'-',color=col,lw=1.3,label=lab)
 ax.set_xlim(0,0.3); ax.set_xlabel(r'$h/J$'); ax.set_ylabel(r'energy ($J$ per site)')
 ax.legend(frameon=False,fontsize=7.5,loc='lower right',bbox_to_anchor=(1.0,0.12),handlelength=1.2)
 ax=axs[2]
-ax.plot(hs,1e3*(Eex-ESQ),'-',color='#d95f02',lw=1.5,label=r'exchange $-\,e_{\rm sq}$')
-ax.plot(hs,1e3*Ez,'-',color='#1b9e77',lw=1.5,label=r'Zeeman $-h\langle S^z\rangle$')
-ax.plot(hs,1e3*(Eex+Ez-ESQ),'-',color='k',lw=1.3,label=r'total $-\,e_{\rm sq}$')
-ax.axhline(0,color='0.6',lw=0.5,ls=':')
-ax.set_xlim(0,0.3); ax.set_xlabel(r'$h/J$'); ax.set_ylabel(r'energy ($10^{-3}J$ per site)')
+for A,col,lab in ((EEX-ESQ,'#d95f02',r'exchange $-\,e_{\rm sq}$'),(EZM,'#1b9e77',r'Zeeman $-h\langle S^z\rangle$'),(TOT-ESQ,'k',r'total $-\,e_{\rm sq}$')):
+    lo,md,hi=q(1e3*A); ax.fill_between(hs,lo,hi,color=col,alpha=0.22,lw=0); ax.plot(hs,md,'-',color=col,lw=1.3,label=lab)
+ax.axhline(0,color='0.6',lw=0.5,ls=':'); ax.set_xlim(0,0.3); ax.set_xlabel(r'$h/J$'); ax.set_ylabel(r'energy ($10^{-3}J$ per site)')
 ax.legend(frameon=False,fontsize=7.5,loc='lower left')
-for a in axs[1:]:
-    for s in steps: a.axvline(s,color='0.75',lw=0.4,ls=':')
 for a,l in zip(axs,'abc'): a.text(-0.3,1.0,f'({l})',transform=a.transAxes,fontsize=10,fontweight='bold',va='bottom')
 plt.savefig('fig_path.pdf'); plt.savefig('fig_path.png',dpi=200)
-# check the exact step relation  Delta E_ex = h Delta S^z  at each jump
-for i in range(1,len(hs)):
-    dS=Sz[i]-Sz[i-1]
-    if dS>1e-4: print('step h=%.4f  dE_ex=%.5f  h*dSz=%.5f'%(hs[i],Eex[i]-Eex[i-1],hs[i]*dS))
-json.dump(dict(h=hs.tolist(),Ezz=Ezz.tolist(),Exy=Exy.tolist(),Sz=Sz.tolist(),f0=f0.tolist(),F={k:v.tolist() for k,v in F.items()}),open('/mnt/user-data/outputs/fieldfig/path_decomp.json','w'))
+# numbers for the text
+def at(A,h): i=np.argmin(abs(hs-h)); return np.percentile(A[:,i],[16,50,84])
+print('end: zz',at(EZ,0.299),'xy',at(EX,0.299),'exchange rise',np.percentile(EEX[:,-1]-EEX[:,0],[16,50,84]))
+cross=[hs[np.argmax(EZ[s]<EX[s])] if (EZ[s]<EX[s]).any() else np.nan for s in range(NS)]
+print('zz/xy crossing h',np.nanpercentile(cross,[16,50,84]))
+print('hub fraction after onset (h=0.08):',at(FC[:,:,0],0.08),'f0',at(F0,0.08))
+print('window max total-energy band width (1e-3J):',np.max(np.percentile(1e3*TOT,84,0)-np.percentile(1e3*TOT,16,0)))
+print('end fractions dice',at(FC[:,:,5],0.299),'m>1/5',at(FC[:,:,4],0.299))

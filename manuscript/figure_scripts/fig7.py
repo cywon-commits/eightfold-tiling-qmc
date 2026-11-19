@@ -32,6 +32,7 @@ b.set_xlabel(r'onset field $h/J$ (median)'); b.set_ylabel('presence probability'
 c_=axs[2]; cAB=np.sqrt(2)-1
 c_.axvline(cAB,color='k',lw=0.6,ls=':'); c_.text(cAB+0.006,0.006,r'$c_{\rm AB}$',fontsize=7.5)
 c_.axhline(0.2,color='#D55E00',lw=0.7,ls=':')
+ext=[]
 for k,lab,col,ls in [sets[1],sets[3]]:
     P=json.load(open(S+f'path_{k}.json')); info=P['info']; rows=P['rows']
     segs=[]; cur=None; h0=None
@@ -44,9 +45,10 @@ for k,lab,col,ls in [sets[1],sets[3]]:
     for key,ha,hb in segs:
         if hb-ha<0.004 or ha<0.09 or ha>0.26 or len(key)!=2: continue
         pts=np.array([(info[q]['sigma']/(1+info[q]['sigma']),info[q]['tau']/(2*(1+info[q]['sigma']))) for q in key])
-        c_.plot(pts[:,0],pts[:,1],'-',color=col,lw=1.0); c_.plot(pts[:,0],pts[:,1],'o',color=col,ms=3)
+        ext.append(pts); c_.plot(pts[:,0],pts[:,1],'-',color=col,lw=1.0); c_.plot(pts[:,0],pts[:,1],'o',color=col,ms=3)
         x=pts[:,0]; y=pts[:,1]; mi=y[0]+(y[1]-y[0])*(cAB-x[0])/(x[1]-x[0]); c_.plot(cAB,mi,'x',color=col,ms=5,mew=1.2)
 c_.plot([],[],'-o',color=sets[1][2],ms=3,label=sets[1][1]); c_.plot([],[],'-o',color=sets[3][2],ms=3,label=sets[3][1])
-c_.set_xlim(0.15,0.65); c_.set_ylim(0.0,0.23); c_.set_xlabel(r'square fraction $c$'); c_.set_ylabel(r'$m$')
+E=np.concatenate(ext); print('tie-line extent c:',E[:,0].min(),E[:,0].max(),' m:',E[:,1].min(),E[:,1].max())
+c_.set_xlim(max(0,E[:,0].min()-0.04),min(1,E[:,0].max()+0.04)); c_.set_ylim(0.0,E[:,1].max()+0.015); c_.set_xlabel(r'square fraction $c$'); c_.set_ylabel(r'$m$')
 for ax_,l in zip(axs,'abc'): ax_.text(-0.2,1.02,f'({l})',transform=ax_.transAxes,fontsize=10,fontweight='bold',va='bottom')
 plt.savefig('figs/fig7.pdf'); plt.savefig('figs/fig7.png',dpi=200)
