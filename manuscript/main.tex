@@ -337,54 +337,46 @@ We use the stochastic series expansion with diagonal updates and a deterministic
 \section{Catalogue of window crystals}\label{app:window}
 Figure~\ref{fig:gallery} and Table~\ref{tab:window} list the $31$ crystals that fill at least $5\%$ of the sites in some redraw of the $N_{\max}=24$ staircase with $m<1/5$, apart from hubs, ribbons and dice. All of them are hub-free. Their only defects are $z=3$ sites on the majority sublattice and $z=5$ sites on the minority sublattice, in equal numbers $n_3$ per cell and joined in bonded pairs, and in every case $m=n_3/2N$. They differ in the density of pairs and in how square regions and rhombus ribbons fill the space between them. Several crystals with the same $m$ have very different arrangements, for example W23--W28 at $m=1/6$. Of the $31$, $21$ come within $2\times10^{-4}J$ per rhombus of the ground-state envelope somewhere in the window, which is $1$--$4\%$ of their cost and comparable to the finite-size uncertainty of the QMC energies. The interaction between pairs is therefore weak, and the window offers many nearly degenerate arrangements in addition to the composition approximants of Sec.~\ref{sec:field}.
 
-\begin{figure*}[t]
+\begin{figure*}[p]
 \includegraphics[width=\textwidth]{figs/fig_window_gallery.pdf}
 \caption{The window crystals of Table~\ref{tab:window}, ordered by $m$. Each panel shows the same area of the tiling. Red dots: $z=3$ sites (majority sublattice); blue squares: $z=5$ sites (minority sublattice); beige: squares; blue-gray: rhombi. Every crystal is hub-free and consists of bonded $z=3$/$z=5$ pairs.}
 \label{fig:gallery}
-\end{figure*}
 
-\begin{table}[t]
+\vspace{4mm}
+\makeatletter\def\@captype{table}\makeatother
+{\small
 \caption{Window crystals of Fig.~\ref{fig:gallery}. $N$: tiles per primitive cell; $\sigma$: squares per rhombus; $n_3$: $z=3$ sites per cell ($=n_5$); $\varepsilon$: cost per rhombus in $J$ from QMC (an asterisk marks the estimate of Eq.~\eqref{eq:fit} for crystals not simulated); sel: percentage of $500$ redraws in which the crystal fills at least $5\%$ of the sites; gap: smallest energy above the ground-state envelope for $0.08<h/J<0.20$, in $10^{-4}J$ per rhombus. Names refer to the data repository.}
 \label{tab:window}
+{\footnotesize\setlength{\tabcolsep}{3.2pt}
 \begin{ruledtabular}
-\begin{tabular}{llrcccccc}
- & name & $N$ & $\sigma$ & $m$ & $n_3$ & $\varepsilon$ & sel & gap\\
+\begin{tabular}{llrcccrrr@{\hspace{6mm}}c@{\hspace{6mm}}llrcccrrr}
+ & name & $N$ & $\sigma$ & $m$ & $n_3$ & $\varepsilon$ & sel & gap &&  & name & $N$ & $\sigma$ & $m$ & $n_3$ & $\varepsilon$ & sel & gap \\
 \hline
-W1 & K17 & 17 & $9/8$ & $1/17$ & 2 & 0.0049 & 17 & 1.0 \\
-W2 & A15 & 15 & $3/2$ & $1/15$ & 2 & 0.0068 & 32 & 0.6 \\
-W3 & B15 & 15 & $1/4$ & $1/15$ & 2 & 0.0035 & 14 & 0.0 \\
-W4 & P24 & 24 & $5/7$ & $1/12$ & 4 & 0.0058 & 97 & 0.0 \\
-W5 & -- & 24 & $7/5$ & $1/12$ & 4 & 0.0095$^*$ & 3 & 3.4 \\
-W6 & -- & 22 & $6/5$ & $1/11$ & 4 & 0.0095$^*$ & 19 & 0.5 \\
-W7 & p4062 & 44 & $6/5$ & $1/11$ & 8 & 0.0102 & 11 & 7.5 \\
-W8 & I20 & 20 & $2/3$ & $1/10$ & 4 & 0.0080 & 18 & 1.6 \\
-W9 & -- & 18 & $5/4$ & $1/9$ & 4 & 0.0136$^*$ & 9 & 1.8 \\
-W10 & U18 & 18 & $4/5$ & $1/9$ & 4 & 0.0104 & 2 & 1.7 \\
-W11 & fourfam & 34 & $9/8$ & $2/17$ & 8 & 0.0137 & 12 & 0.8 \\
-W12 & C16 & 16 & $1$ & $1/8$ & 4 & 0.0139 & 22 & 0.0 \\
-W13 & D16 & 16 & $3/5$ & $1/8$ & 4 & 0.0110 & 7 & 2.4 \\
-W14 & Q23 & 23 & $9/14$ & $3/23$ & 6 & 0.0117 & 93 & 0.0 \\
-W15 & -- & 23 & $11/12$ & $3/23$ & 6 & 0.0142$^*$ & 19 & 1.1 \\
-W16 & T21 & 21 & $11/10$ & $1/7$ & 6 & 0.0179 & 12 & 0.5 \\
-W17 & -- & 21 & $13/8$ & $1/7$ & 6 & 0.0233$^*$ & 4 & 3.0 \\
-W18 & p8042 & 56 & $4/3$ & $1/7$ & 16 & 0.0202 & 2 & 0.0 \\
-W19 & Z19 & 19 & $11/8$ & $3/19$ & 6 & 0.0236 & 5 & 0.0 \\
-W20 & -- & 19 & $9/10$ & $3/19$ & 6 & 0.0187$^*$ & 4 & 3.4 \\
-W21 & -- & 19 & $5/14$ & $3/19$ & 6 & 0.0134$^*$ & 4 & 2.1 \\
-W22 & -- & 19 & $7/12$ & $3/19$ & 6 & 0.0157$^*$ & 3 & 4.0 \\
-W23 & -- & 19 & $13/6$ & $3/19$ & 6 & 0.0330$^*$ & 3 & 5.7 \\
-W24 & R24 & 24 & $5/7$ & $1/6$ & 8 & 0.0179 & 52 & 0.0 \\
-W25 & -- & 24 & $1$ & $1/6$ & 8 & 0.0211$^*$ & 26 & 1.0 \\
-W26 & -- & 24 & $2$ & $1/6$ & 8 & 0.0329$^*$ & 15 & 1.2 \\
-W27 & -- & 24 & $1/2$ & $1/6$ & 8 & 0.0159$^*$ & 14 & 1.7 \\
-W28 & AA24 & 24 & $7/5$ & $1/6$ & 8 & 0.0258 & 5 & 0.6 \\
-W29 & AH17 & 17 & $11/6$ & $3/17$ & 6 & 0.0350 & 3 & 18.2 \\
-W30 & -- & 22 & $2/9$ & $2/11$ & 8 & 0.0148$^*$ & 11 & 1.5 \\
-W31 & AC22 & 22 & $7/4$ & $2/11$ & 8 & 0.0343 & 10 & 8.9 \\
+W1 & K17 & 17 & $9/8$ & $1/17$ & 2 & 0.0049 & 17 & 1.0 && W17 & -- & 21 & $13/8$ & $1/7$ & 6 & 0.0233\rlap{$^*$} & 4 & 3.0 \\
+W2 & A15 & 15 & $3/2$ & $1/15$ & 2 & 0.0068 & 32 & 0.6 && W18 & p8042 & 56 & $4/3$ & $1/7$ & 16 & 0.0202 & 2 & 0.0 \\
+W3 & B15 & 15 & $1/4$ & $1/15$ & 2 & 0.0035 & 14 & 0.0 && W19 & Z19 & 19 & $11/8$ & $3/19$ & 6 & 0.0236 & 5 & 0.0 \\
+W4 & P24 & 24 & $5/7$ & $1/12$ & 4 & 0.0058 & 97 & 0.0 && W20 & -- & 19 & $9/10$ & $3/19$ & 6 & 0.0187\rlap{$^*$} & 4 & 3.4 \\
+W5 & -- & 24 & $7/5$ & $1/12$ & 4 & 0.0095\rlap{$^*$} & 3 & 3.4 && W21 & -- & 19 & $5/14$ & $3/19$ & 6 & 0.0134\rlap{$^*$} & 4 & 2.1 \\
+W6 & -- & 22 & $6/5$ & $1/11$ & 4 & 0.0095\rlap{$^*$} & 19 & 0.5 && W22 & -- & 19 & $7/12$ & $3/19$ & 6 & 0.0157\rlap{$^*$} & 3 & 4.0 \\
+W7 & p4062 & 44 & $6/5$ & $1/11$ & 8 & 0.0102 & 11 & 7.5 && W23 & -- & 19 & $13/6$ & $3/19$ & 6 & 0.0330\rlap{$^*$} & 3 & 5.7 \\
+W8 & I20 & 20 & $2/3$ & $1/10$ & 4 & 0.0080 & 18 & 1.6 && W24 & R24 & 24 & $5/7$ & $1/6$ & 8 & 0.0179 & 52 & 0.0 \\
+W9 & -- & 18 & $5/4$ & $1/9$ & 4 & 0.0136\rlap{$^*$} & 9 & 1.8 && W25 & -- & 24 & $1$ & $1/6$ & 8 & 0.0211\rlap{$^*$} & 26 & 1.0 \\
+W10 & U18 & 18 & $4/5$ & $1/9$ & 4 & 0.0104 & 2 & 1.7 && W26 & -- & 24 & $2$ & $1/6$ & 8 & 0.0329\rlap{$^*$} & 15 & 1.2 \\
+W11 & fourfam & 34 & $9/8$ & $2/17$ & 8 & 0.0137 & 12 & 0.8 && W27 & -- & 24 & $1/2$ & $1/6$ & 8 & 0.0159\rlap{$^*$} & 14 & 1.7 \\
+W12 & C16 & 16 & $1$ & $1/8$ & 4 & 0.0139 & 22 & 0.0 && W28 & AA24 & 24 & $7/5$ & $1/6$ & 8 & 0.0258 & 5 & 0.6 \\
+W13 & D16 & 16 & $3/5$ & $1/8$ & 4 & 0.0110 & 7 & 2.4 && W29 & AH17 & 17 & $11/6$ & $3/17$ & 6 & 0.0350 & 3 & 18.2 \\
+W14 & Q23 & 23 & $9/14$ & $3/23$ & 6 & 0.0117 & 93 & 0.0 && W30 & -- & 22 & $2/9$ & $2/11$ & 8 & 0.0148\rlap{$^*$} & 11 & 1.5 \\
+W15 & -- & 23 & $11/12$ & $3/23$ & 6 & 0.0142\rlap{$^*$} & 19 & 1.1 && W31 & AC22 & 22 & $7/4$ & $2/11$ & 8 & 0.0343 & 10 & 8.9 \\
+W16 & T21 & 21 & $11/10$ & $1/7$ & 6 & 0.0179 & 12 & 0.5 && & & & & & & & & \\
 \end{tabular}
 \end{ruledtabular}
-\end{table}
+}
+}
+\end{figure*}
 
+
+
+\clearpage
 \begin{thebibliography}{99}
 \bibitem{Villain1980} J. Villain, R. Bidaux, J.-P. Carton, and R. Conte, Order as an effect of disorder, \href{https://doi.org/10.1051/jphys:0198000410110126300}{J. Phys. (Paris) \textbf{41}, 1263 (1980)}.
 \bibitem{Henley1989} C. L. Henley, Ordering due to disorder in a frustrated vector antiferromagnet, \href{https://doi.org/10.1103/PhysRevLett.62.2056}{Phys. Rev. Lett. \textbf{62}, 2056 (1989)}.
