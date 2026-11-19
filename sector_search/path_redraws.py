@@ -33,5 +33,6 @@ def solve(e):
     return W
 rng=np.random.default_rng(7); out=np.zeros((NS,len(hs),n),dtype=np.float32)
 for s in range(NS): out[s]=solve(EP+ER*rng.standard_normal(n))
-np.savez_compressed('path_redraws_N24.npz',W=out,hs=hs,keep=np.array(keep),sigma=S,tau=T_,names=np.array([names[i] for i in keep]),qkey=np.array([qk[i] or '' for i in keep]),eps=EP,err=ER)
+W0=solve(EP)
+np.savez_compressed('path_redraws_N24.npz',W=out,W0=W0,hs=hs,keep=np.array(keep),sigma=S,tau=T_,names=np.array([names[i] for i in keep]),qkey=np.array([qk[i] or '' for i in keep]),eps=EP,err=ER)
 print('kept',n,'redraws',NS)
